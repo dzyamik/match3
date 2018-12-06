@@ -253,14 +253,14 @@ function orbMove(pX, pY) {
     var distY = pY - selectedOrb.orbSprite.y;
     var deltaRow = 0;
     var deltaCol = 0;
-    if (Math.abs(distX) > ORB_SIZE / 2) {
+    if (Math.abs(distX) > ORB_SIZE / 4) {
         if (distX > 0) {
             deltaCol = 1;
         } else {
             deltaCol = -1;
         }
     } else {
-        if (Math.abs(distY) > ORB_SIZE / 2) {
+        if (Math.abs(distY) > ORB_SIZE / 4) {
             if (distY > 0) {
                 deltaRow = 1;
             } else {
@@ -481,7 +481,7 @@ function handleVerticalMatches() {
             }
             if (gemAt(j, i).orbColor !== currentColor || j === FIELD_SIZE - 1) {
                 if (colorStreak >= 3) {
-                    console.log("VERTICAL :: Length = " + colorStreak + " :: Start = (" + startStreak + "," + i + ") :: Color = " + currentColor);
+                    // console.log("VERTICAL :: Length = " + colorStreak + " :: Start = (" + startStreak + "," + i + ") :: Color = " + currentColor);
                     for (var k = 0; k < colorStreak; k++) {
                         removeMap[startStreak + k][i]++;
                     }
@@ -505,7 +505,7 @@ function handleHorizontalMatches() {
             }
             if (gemAt(i, j).orbColor !== currentColor || j === FIELD_SIZE - 1) {
                 if (colorStreak >= 3) {
-                    console.log("HORIZONTAL :: Length = " + colorStreak + " :: Start = (" + i + "," + startStreak + ") :: Color = " + currentColor);
+                    // console.log("HORIZONTAL :: Length = " + colorStreak + " :: Start = (" + i + "," + startStreak + ") :: Color = " + currentColor);
                     for (var k = 0; k < colorStreak; k++) {
                         removeMap[i][startStreak + k]++;
                     }
@@ -547,7 +547,7 @@ function destroyOrbs() {
             }
         }
     }
-    console.log('Your score: ', score);
+    console.log('Score: ' + score);
 }
 
 function makeOrbsFall() {
