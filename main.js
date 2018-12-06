@@ -75,6 +75,8 @@ var textAnimationConfig = {
 };
 var tutorialEnded = false;
 
+var score = 0;
+
 window.onresize = resize;
 window.addEventListener('resize', resize, true);
 
@@ -521,7 +523,7 @@ function destroyOrbs() {
     for (var i = 0; i < FIELD_SIZE; i++) {
         for (var j = 0; j < FIELD_SIZE; j++) {
             if (removeMap[i][j] > 0) {
-
+                score++;
                 // destroy orbs tween
                 tweens.add({
                     targets: gameArray[i][j].orbSprite,
@@ -545,6 +547,7 @@ function destroyOrbs() {
             }
         }
     }
+    console.log('Your score: ', score);
 }
 
 function makeOrbsFall() {
