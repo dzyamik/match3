@@ -529,7 +529,7 @@ function destroyOrbs() {
                     targets: gameArray[i][j].orbSprite,
                     alpha: 0,
                     duration: DESTROY_SPEED,
-                    ease: 'None',
+                    ease: 'Power1',
                     repeat: 0,
                     onComplete: function () {
                         this.targets[0].destroy();
@@ -568,7 +568,7 @@ function makeOrbsFall() {
                         targets: gameArray[i][j].orbSprite,
                         y: gameArray[i][j].orbSprite.y + fallTiles * ORB_SIZE,
                         duration: FALL_SPEED,
-                        ease: 'None',
+                        ease: 'Bounce.easeOut',
                         repeat: 0,
                         onComplete: function () {
                             fallen--;
@@ -622,7 +622,7 @@ function replenishField() {
                 tweens.add({
                     targets: gameArray[i][j].orbSprite,
                     y: ORB_SIZE * i + ORB_SIZE / 2,
-                    ease: 'None',
+                    ease: 'Bounce.easeOut',
                     duration: FALL_SPEED,
                     repeat: 0,
                     onComplete: function () {
