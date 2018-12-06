@@ -321,11 +321,11 @@ function swapOrbs(orb1, orb2, swapBack) {
 }
 
 function areNext(orb1, orb2) {
-    return Math.abs(getOrbRow(orb1) - getOrbRow(orb2)) + Math.abs(getOrbCol(orb1) - getOrbCol(orb2)) == 1;
+    return (Math.abs(getOrbRow(orb1) - getOrbRow(orb2)) + Math.abs(getOrbCol(orb1) - getOrbCol(orb2)) == 1);
 }
 
 function areTheSame(orb1, orb2) {
-    return getOrbRow(orb1) == getOrbRow(orb2) && getOrbCol(orb1) == getOrbCol(orb2);
+    return (getOrbRow(orb1) == getOrbRow(orb2) && getOrbCol(orb1) == getOrbCol(orb2));
 }
 
 function gemAt(row, col) {
@@ -344,15 +344,15 @@ function getOrbCol(orb) {
 }
 
 function isHorizontalMatch(row, col) {
-    return gemAt(row, col).orbColor == gemAt(row, col - 1).orbColor && gemAt(row, col).orbColor == gemAt(row, col - 2).orbColor;
+    return (gemAt(row, col).orbColor == gemAt(row, col - 1).orbColor && gemAt(row, col).orbColor == gemAt(row, col - 2).orbColor);
 }
 
 function isVerticalMatch(row, col) {
-    return gemAt(row, col).orbColor == gemAt(row - 1, col).orbColor && gemAt(row, col).orbColor == gemAt(row - 2, col).orbColor;
+    return (gemAt(row, col).orbColor == gemAt(row - 1, col).orbColor && gemAt(row, col).orbColor == gemAt(row - 2, col).orbColor);
 }
 
 function isMatch(row, col) {
-    return isHorizontalMatch(row, col) || isVerticalMatch(row, col);
+    return (isHorizontalMatch(row, col) || isVerticalMatch(row, col));
 }
 
 function matchInBoard() {
@@ -449,18 +449,18 @@ function handleMatches() {
         }
 
 
-        for (var i = 0; i < FIELD_SIZE; i++) {
-            for (var j = 0; j < FIELD_SIZE; j++) {
-                gameArray[i][j].orbSprite.setInteractive();
-                gameArray[i][j].orbSprite.input.draggable = true;
+        for (var n = 0; n < FIELD_SIZE; n++) {
+            for (var m = 0; m < FIELD_SIZE; m++) {
+                gameArray[n][m].orbSprite.setInteractive();
+                gameArray[n][m].orbSprite.input.draggable = true;
             }
         }
     }
     removeMap = [];
-    for (var i = 0; i < FIELD_SIZE; i++) {
-        removeMap[i] = [];
-        for (var j = 0; j < FIELD_SIZE; j++) {
-            removeMap[i].push(0);
+    for (var f = 0; f < FIELD_SIZE; f++) {
+        removeMap[f] = [];
+        for (var g = 0; g < FIELD_SIZE; g++) {
+            removeMap[f].push(0);
         }
     }
     handleHorizontalMatches();
