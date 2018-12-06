@@ -106,9 +106,9 @@ function resize() {
 
 function preload() {
     this.load.atlas('orbs', './orbs.png', './orbs.json');
-    if (navigator.appVersion.indexOf("Android") != -1) {
+    if (navigator.appVersion.indexOf("Android") !== -1) {
         this.load.image('GBtn', './GBtn.png');
-    } else if (navigator.appVersion.indexOf("iPhone") != -1) {
+    } else if (navigator.appVersion.indexOf("iPhone") !== -1) {
         isAndroid = false;
         this.load.image('ABtn', './ABtn.png');
     } else {
@@ -165,7 +165,7 @@ function create() {
         }
     });
 
-    this.input.on('dragend', function (pointer, gameObject) {
+    this.input.on('dragend', function (pointer) {
         orbDeselect(pointer);
     });
     scene = orbGroup.scene;
@@ -215,8 +215,8 @@ function orbSelect(pointer) {
     if (canPick) {
         var row = Math.floor(pointer.y / ORB_SIZE);
         var col = Math.floor(pointer.x / ORB_SIZE);
-        var pickedOrb = gemAt(row, col)
-        if (pickedOrb != -1) {
+        var pickedOrb = gemAt(row, col);
+        if (pickedOrb !== -1) {
             if (selectedOrb == null) {
                 pickedOrb.orbSprite.setScale(1.2);
                 orbGroup.scene.children.bringToTop(pickedOrb.orbSprite);
@@ -242,7 +242,7 @@ function orbSelect(pointer) {
     }
 }
 
-function orbDeselect(pointer) {
+function orbDeselect() {
     moveCallback = false;
 }
 
@@ -266,9 +266,9 @@ function orbMove(pX, pY) {
             }
         }
     }
-    if (deltaRow + deltaCol != 0) {
+    if (deltaRow + deltaCol !== 0) {
         var pickedOrb = gemAt(getOrbRow(selectedOrb) + deltaRow, getOrbCol(selectedOrb) + deltaCol);
-        if (pickedOrb != -1) {
+        if (pickedOrb !== -1) {
             selectedOrb.orbSprite.setScale(1);
             swapOrbs(selectedOrb, pickedOrb, true);
             moveCallback = false;
@@ -321,11 +321,11 @@ function swapOrbs(orb1, orb2, swapBack) {
 }
 
 function areNext(orb1, orb2) {
-    return (Math.abs(getOrbRow(orb1) - getOrbRow(orb2)) + Math.abs(getOrbCol(orb1) - getOrbCol(orb2)) == 1);
+    return (Math.abs(getOrbRow(orb1) - getOrbRow(orb2)) + Math.abs(getOrbCol(orb1) - getOrbCol(orb2)) === 1);
 }
 
 function areTheSame(orb1, orb2) {
-    return (getOrbRow(orb1) == getOrbRow(orb2) && getOrbCol(orb1) == getOrbCol(orb2));
+    return (getOrbRow(orb1) === getOrbRow(orb2) && getOrbCol(orb1) === getOrbCol(orb2));
 }
 
 function gemAt(row, col) {
@@ -344,11 +344,11 @@ function getOrbCol(orb) {
 }
 
 function isHorizontalMatch(row, col) {
-    return (gemAt(row, col).orbColor == gemAt(row, col - 1).orbColor && gemAt(row, col).orbColor == gemAt(row, col - 2).orbColor);
+    return (gemAt(row, col).orbColor === gemAt(row, col - 1).orbColor && gemAt(row, col).orbColor === gemAt(row, col - 2).orbColor);
 }
 
 function isVerticalMatch(row, col) {
-    return (gemAt(row, col).orbColor == gemAt(row - 1, col).orbColor && gemAt(row, col).orbColor == gemAt(row - 2, col).orbColor);
+    return (gemAt(row, col).orbColor === gemAt(row - 1, col).orbColor && gemAt(row, col).orbColor === gemAt(row - 2, col).orbColor);
 }
 
 function isMatch(row, col) {
@@ -474,10 +474,10 @@ function handleVerticalMatches() {
         var currentColor = -1;
         var startStreak = 0;
         for (var j = 0; j < FIELD_SIZE; j++) {
-            if (gemAt(j, i).orbColor == currentColor) {
+            if (gemAt(j, i).orbColor === currentColor) {
                 colorStreak++;
             }
-            if (gemAt(j, i).orbColor != currentColor || j == FIELD_SIZE - 1) {
+            if (gemAt(j, i).orbColor !== currentColor || j === FIELD_SIZE - 1) {
                 if (colorStreak >= 3) {
                     console.log("VERTICAL :: Length = " + colorStreak + " :: Start = (" + startStreak + "," + i + ") :: Color = " + currentColor);
                     for (var k = 0; k < colorStreak; k++) {
@@ -498,10 +498,10 @@ function handleHorizontalMatches() {
         var currentColor = -1;
         var startStreak = 0;
         for (var j = 0; j < FIELD_SIZE; j++) {
-            if (gemAt(i, j).orbColor == currentColor) {
+            if (gemAt(i, j).orbColor === currentColor) {
                 colorStreak++;
             }
-            if (gemAt(i, j).orbColor != currentColor || j == FIELD_SIZE - 1) {
+            if (gemAt(i, j).orbColor !== currentColor || j === FIELD_SIZE - 1) {
                 if (colorStreak >= 3) {
                     console.log("HORIZONTAL :: Length = " + colorStreak + " :: Start = (" + i + "," + startStreak + ") :: Color = " + currentColor);
                     for (var k = 0; k < colorStreak; k++) {
@@ -532,7 +532,7 @@ function destroyOrbs() {
                     onComplete: function () {
                         this.targets[0].destroy();
                         destroyed--;
-                        if (destroyed == 0) {
+                        if (destroyed === 0) {
                             makeOrbsFall();
                             if (fastFall) {
                                 replenishField();
@@ -569,7 +569,7 @@ function makeOrbsFall() {
                         repeat: 0,
                         onComplete: function () {
                             fallen--;
-                            if (fallen == 0) {
+                            if (fallen === 0) {
                                 if (restart) {
                                     makeOrbsFall();
                                 } else {
@@ -590,7 +590,7 @@ function makeOrbsFall() {
             }
         }
     }
-    if (fallen == 0) {
+    if (fallen === 0) {
         replenishField();
     }
 }
@@ -611,7 +611,7 @@ function replenishField() {
                 gameArray[i][j] = {
                     orbColor: randomColor,
                     orbSprite: orb
-                }
+                };
                 orbGroup.add(orb);
                 orbGroup.scene.input.setDraggable(orb);
 
@@ -624,7 +624,7 @@ function replenishField() {
                     repeat: 0,
                     onComplete: function () {
                         replenished--;
-                        if (replenished == 0) {
+                        if (replenished === 0) {
                             if (restart) {
                                 makeOrbsFall();
                             } else {
