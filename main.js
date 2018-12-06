@@ -8,18 +8,21 @@ var config = {
         create: create
     }
 };
+
+// Block of parsed like configs
+
 // max canvas size to not get "square pixels"
 var MAX_WIDTH = 700;
 var MAX_HEIGHT = 800;
 var MAX_FIELD_HEIGHT = 700;
 //
-var fieldSize = 7;
-var orbColors = 6;
-var orbSize = 100;
+var FIELD_SIZE = 7;
+var ORB_COLORS = 6;
+var ORB_SIZE = 100;
 //
-var swapSpeed = 200;
-var fallSpeed = 1000;
-var destroySpeed = 500;
+var SWAP_SPEED = 200;
+var FALL_SPEED = 1000;
+var DESTROY_SPEED = 500;
 var fastFall = true;
 var moveCallback = false;
 //
@@ -50,6 +53,26 @@ var tutorialBuild = [
 ];
 var tutorialGraphics;
 var tutorialText;
+var TEXT = {
+    x: 398,
+    y: 540,
+    text: '↑   ↔   ↑\nSwap these two elements',
+    textStyle: {
+        fill: '#00ff00',
+        fontSize: 30,
+        fontFamily: 'Arial',
+        align: 'center'
+    }
+};
+var textAnimationConfig = {
+    targets: '',
+    scaleX: 1.2,
+    scaleY: 1.2,
+    ease: 'None',
+    yoyo: true,
+    duration: 700,
+    repeat: -1
+};
 var tutorialEnded = false;
 
 window.onresize = resize;
@@ -98,11 +121,11 @@ function preload() {
 
 function create() {
     orbGroup = this.add.group();
-    for (var i = 0; i < fieldSize; i++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
         gameArray[i] = [];
-        for (var j = 0; j < fieldSize; j++) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             var color = tutorialBuild[i][j];
-            var orb = this.add.image(orbSize * j + orbSize / 2, orbSize * i + orbSize / 2, 'orbs', color.toString()).setOrigin(0.5, 0.5);
+            var orb = this.add.image(ORB_SIZE * j + ORB_SIZE / 2, ORB_SIZE * i + ORB_SIZE / 2, 'orbs', color.toString()).setOrigin(0.5, 0.5);
             gameArray[i][j] = {
                 orbColor: color,
                 orbSprite: orb
@@ -112,18 +135,19 @@ function create() {
             // random start
             // var randomColor;
             // do {
-            //     randomColor = Phaser.Math.Between(0, orbColors - 1);
+            //     randomColor = Phaser.Math.Between(0, ORB_COLORS - 1);
             //     gameArray[i][j] = {
             //         orbColor: randomColor
             //     }
             // } while (isMatch(i, j));
-            // var orb = this.add.image(orbSize * j + orbSize / 2, orbSize * i + orbSize / 2, 'orbs', randomColor.toString()).setOrigin(0.5, 0.5).setInteractive();
+            // var orb = this.add.image(ORB_SIZE * j + ORB_SIZE / 2, ORB_SIZE * i + ORB_SIZE / 2, 'orbs', randomColor.toString()).setOrigin(0.5, 0.5).setInteractive();
             // gameArray[i][j].orbSprite = orb;
             // orbGroup.add(orb);
             // this.input.setDraggable(orb);
         }
     }
 
+    //
     gameArray[4][3].orbSprite.setInteractive();
     gameArray[4][4].orbSprite.setInteractive();
     this.input.setDraggable(gameArray[4][3].orbSprite);
@@ -154,28 +178,15 @@ function create() {
     tutorialGraphics = this.add.graphics();
     tutorialGraphics.alpha = 0.65;
     tutorialGraphics.fillStyle(0x444444);
-    tutorialGraphics.fillRect(0, 0, MAX_WIDTH, 2 * orbSize);
-    tutorialGraphics.fillRect(0, 2 * orbSize, initialX * orbSize, 3 * orbSize);
+    tutorialGraphics.fillRect(0, 0, MAX_WIDTH, 2 * ORB_SIZE);
+    tutorialGraphics.fillRect(0, 2 * ORB_SIZE, initialX * ORB_SIZE, 3 * ORB_SIZE);
+    tutorialGraphics.fillRect((initialX + 1) * ORB_SIZE, 2 * ORB_SIZE, MAX_WIDTH - (initialX + 1) * ORB_SIZE, 2 * ORB_SIZE);
+    tutorialGraphics.fillRect((initialX + 2) * ORB_SIZE, initialY * ORB_SIZE, MAX_WIDTH - (initialX + 2) * ORB_SIZE, ORB_SIZE);
+    tutorialGraphics.fillRect(0, (initialY + 1) * ORB_SIZE, MAX_WIDTH, MAX_FIELD_HEIGHT - (initialY + 1) * ORB_SIZE);
 
-    tutorialGraphics.fillRect((initialX + 1) * orbSize, 2 * orbSize, MAX_WIDTH - (initialX + 1) * orbSize, 2 * orbSize);
-    tutorialGraphics.fillRect((initialX + 2) * orbSize, initialY * orbSize, MAX_WIDTH - (initialX + 2) * orbSize, orbSize);
-
-    tutorialGraphics.fillRect(0, (initialY + 1) * orbSize, MAX_WIDTH, MAX_FIELD_HEIGHT - (initialY + 1) * orbSize);
-
-    tutorialText = this.add.text(398, 540, '↑   ↔   ↑\nSwap these two elements', { fill: '#00ff00', fontSize: 30, fontFamily: 'Arial', align: 'center' })
-        .setOrigin(0.5, 0.5);
-    tweens.add({
-        targets: tutorialText,
-        scaleX: 1.2,
-        scaleY: 1.2,
-        ease: 'None',
-        yoyo: true,
-        duration: 700,
-        repeat: -1
-    });
-
-
-
+    tutorialText = this.add.text(TEXT.x, TEXT.y, TEXT.text, TEXT.textStyle).setOrigin(0.5, 0.5);
+    textAnimationConfig.targets = tutorialText;
+    tweens.add(textAnimationConfig);
 
     // redirect buttons
     if (isAndroid) {
@@ -191,21 +202,19 @@ function create() {
         GBtn.alpha = 0;
     }
 
-
     resize();
 }
 
 
 function redirect(url) {
     window.location.href = url;
-    // window.open(url, '_blank');
 }
 
 
 function orbSelect(pointer) {
     if (canPick) {
-        var row = Math.floor(pointer.y / orbSize);
-        var col = Math.floor(pointer.x / orbSize);
+        var row = Math.floor(pointer.y / ORB_SIZE);
+        var col = Math.floor(pointer.x / ORB_SIZE);
         var pickedOrb = gemAt(row, col)
         if (pickedOrb != -1) {
             if (selectedOrb == null) {
@@ -242,14 +251,14 @@ function orbMove(pX, pY) {
     var distY = pY - selectedOrb.orbSprite.y;
     var deltaRow = 0;
     var deltaCol = 0;
-    if (Math.abs(distX) > orbSize / 2) {
+    if (Math.abs(distX) > ORB_SIZE / 2) {
         if (distX > 0) {
             deltaCol = 1;
         } else {
             deltaCol = -1;
         }
     } else {
-        if (Math.abs(distY) > orbSize / 2) {
+        if (Math.abs(distY) > ORB_SIZE / 2) {
             if (distY > 0) {
                 deltaRow = 1;
             } else {
@@ -281,20 +290,20 @@ function swapOrbs(orb1, orb2, swapBack) {
     // orb tween 1st itteration
     tweens.add({
         targets: gameArray[getOrbRow(orb1)][getOrbCol(orb1)].orbSprite,
-        x: getOrbCol(orb1) * orbSize + orbSize / 2,
-        y: getOrbRow(orb1) * orbSize + orbSize / 2,
+        x: getOrbCol(orb1) * ORB_SIZE + ORB_SIZE / 2,
+        y: getOrbRow(orb1) * ORB_SIZE + ORB_SIZE / 2,
         ease: 'None',
-        duration: swapSpeed,
+        duration: SWAP_SPEED,
         repeat: 0
     });
 
     // orb tween 2nd itteration
     tweens.add({
         targets: gameArray[getOrbRow(orb2)][getOrbCol(orb2)].orbSprite,
-        x: getOrbCol(orb2) * orbSize + orbSize / 2,
-        y: getOrbRow(orb2) * orbSize + orbSize / 2,
+        x: getOrbCol(orb2) * ORB_SIZE + ORB_SIZE / 2,
+        y: getOrbRow(orb2) * ORB_SIZE + ORB_SIZE / 2,
         ease: 'None',
-        duration: swapSpeed,
+        duration: SWAP_SPEED,
         repeat: 0,
         onComplete: function () {
             if (!matchInBoard() && swapBack) {
@@ -320,18 +329,18 @@ function areTheSame(orb1, orb2) {
 }
 
 function gemAt(row, col) {
-    if (row < 0 || row >= fieldSize || col < 0 || col >= fieldSize) {
+    if (row < 0 || row >= FIELD_SIZE || col < 0 || col >= FIELD_SIZE) {
         return -1;
     }
     return gameArray[row][col];
 }
 
 function getOrbRow(orb) {
-    return Math.floor(orb.orbSprite.y / orbSize);
+    return Math.floor(orb.orbSprite.y / ORB_SIZE);
 }
 
 function getOrbCol(orb) {
-    return Math.floor(orb.orbSprite.x / orbSize);
+    return Math.floor(orb.orbSprite.x / ORB_SIZE);
 }
 
 function isHorizontalMatch(row, col) {
@@ -347,8 +356,8 @@ function isMatch(row, col) {
 }
 
 function matchInBoard() {
-    for (var i = 0; i < fieldSize; i++) {
-        for (var j = 0; j < fieldSize; j++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             if (isMatch(i, j)) {
                 return true;
             }
@@ -364,11 +373,11 @@ function handleMatches() {
             targets: tutorialGraphics,
             alpha: 0,
             ease: 'None',
-            duration: swapSpeed,
+            duration: SWAP_SPEED,
             repeat: 0,
-            onComplete: function() {
+            onComplete: function () {
                 tutorialGraphics.clear();
-                delete(tutorialGraphics);
+                delete (tutorialGraphics);
                 // scene.children.remove(scene.children.last);
 
                 tutorialEnded = true;
@@ -379,10 +388,10 @@ function handleMatches() {
             targets: tutorialText,
             alpha: 0,
             ease: 'None',
-            duration: swapSpeed,
+            duration: SWAP_SPEED,
             repeat: 0,
-            onComplete: function() {
-                delete(tutorialText);
+            onComplete: function () {
+                delete (tutorialText);
             }
         });
         // buttons appear
@@ -391,10 +400,10 @@ function handleMatches() {
                 targets: GBtn,
                 alpha: 1,
                 ease: 'None',
-                duration: swapSpeed,
+                duration: SWAP_SPEED,
                 repeat: 0,
-                onComplete: function() {
-                    this.targets[0].setInteractive().on('pointerdown', function() {
+                onComplete: function () {
+                    this.targets[0].setInteractive().on('pointerdown', function () {
                         redirect(GLink);
                     });
                 }
@@ -404,10 +413,10 @@ function handleMatches() {
                 targets: ABtn,
                 alpha: 1,
                 ease: 'None',
-                duration: swapSpeed,
+                duration: SWAP_SPEED,
                 repeat: 0,
-                onComplete: function() {
-                    this.targets[0].setInteractive().on('pointerdown', function() {
+                onComplete: function () {
+                    this.targets[0].setInteractive().on('pointerdown', function () {
                         redirect(ALink);
                     });
                 }
@@ -417,10 +426,10 @@ function handleMatches() {
                 targets: ABtn,
                 alpha: 1,
                 ease: 'None',
-                duration: swapSpeed,
+                duration: SWAP_SPEED,
                 repeat: 0,
-                onComplete: function() {
-                    this.targets[0].setInteractive().on('pointerdown', function() {
+                onComplete: function () {
+                    this.targets[0].setInteractive().on('pointerdown', function () {
                         redirect(ALink);
                     });
                 }
@@ -429,10 +438,10 @@ function handleMatches() {
                 targets: GBtn,
                 alpha: 1,
                 ease: 'None',
-                duration: swapSpeed,
+                duration: SWAP_SPEED,
                 repeat: 0,
-                onComplete: function() {
-                    this.targets[0].setInteractive().on('pointerdown', function() {
+                onComplete: function () {
+                    this.targets[0].setInteractive().on('pointerdown', function () {
                         redirect(GLink);
                     });
                 }
@@ -440,17 +449,17 @@ function handleMatches() {
         }
 
 
-        for (var i = 0; i < fieldSize; i++) {
-            for (var j = 0; j < fieldSize; j++) {
+        for (var i = 0; i < FIELD_SIZE; i++) {
+            for (var j = 0; j < FIELD_SIZE; j++) {
                 gameArray[i][j].orbSprite.setInteractive();
                 gameArray[i][j].orbSprite.input.draggable = true;
             }
         }
     }
     removeMap = [];
-    for (var i = 0; i < fieldSize; i++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
         removeMap[i] = [];
-        for (var j = 0; j < fieldSize; j++) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             removeMap[i].push(0);
         }
     }
@@ -460,15 +469,15 @@ function handleMatches() {
 }
 
 function handleVerticalMatches() {
-    for (var i = 0; i < fieldSize; i++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
         var colorStreak = 1;
         var currentColor = -1;
         var startStreak = 0;
-        for (var j = 0; j < fieldSize; j++) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             if (gemAt(j, i).orbColor == currentColor) {
                 colorStreak++;
             }
-            if (gemAt(j, i).orbColor != currentColor || j == fieldSize - 1) {
+            if (gemAt(j, i).orbColor != currentColor || j == FIELD_SIZE - 1) {
                 if (colorStreak >= 3) {
                     console.log("VERTICAL :: Length = " + colorStreak + " :: Start = (" + startStreak + "," + i + ") :: Color = " + currentColor);
                     for (var k = 0; k < colorStreak; k++) {
@@ -484,15 +493,15 @@ function handleVerticalMatches() {
 }
 
 function handleHorizontalMatches() {
-    for (var i = 0; i < fieldSize; i++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
         var colorStreak = 1;
         var currentColor = -1;
         var startStreak = 0;
-        for (var j = 0; j < fieldSize; j++) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             if (gemAt(i, j).orbColor == currentColor) {
                 colorStreak++;
             }
-            if (gemAt(i, j).orbColor != currentColor || j == fieldSize - 1) {
+            if (gemAt(i, j).orbColor != currentColor || j == FIELD_SIZE - 1) {
                 if (colorStreak >= 3) {
                     console.log("HORIZONTAL :: Length = " + colorStreak + " :: Start = (" + i + "," + startStreak + ") :: Color = " + currentColor);
                     for (var k = 0; k < colorStreak; k++) {
@@ -509,15 +518,15 @@ function handleHorizontalMatches() {
 
 function destroyOrbs() {
     var destroyed = 0;
-    for (var i = 0; i < fieldSize; i++) {
-        for (var j = 0; j < fieldSize; j++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             if (removeMap[i][j] > 0) {
 
                 // destroy orbs tween
                 tweens.add({
                     targets: gameArray[i][j].orbSprite,
                     alpha: 0,
-                    duration: destroySpeed,
+                    duration: DESTROY_SPEED,
                     ease: 'None',
                     repeat: 0,
                     onComplete: function () {
@@ -541,8 +550,8 @@ function destroyOrbs() {
 function makeOrbsFall() {
     var fallen = 0;
     var restart = false;
-    for (var i = fieldSize - 2; i >= 0; i--) {
-        for (var j = 0; j < fieldSize; j++) {
+    for (var i = FIELD_SIZE - 2; i >= 0; i--) {
+        for (var j = 0; j < FIELD_SIZE; j++) {
             if (gameArray[i][j] != null) {
                 var fallTiles = holesBelow(i, j);
                 if (fallTiles > 0) {
@@ -554,8 +563,8 @@ function makeOrbsFall() {
                     // orbs tween to fall
                     tweens.add({
                         targets: gameArray[i][j].orbSprite,
-                        y: gameArray[i][j].orbSprite.y + fallTiles * orbSize,
-                        duration: fallSpeed,
+                        y: gameArray[i][j].orbSprite.y + fallTiles * ORB_SIZE,
+                        duration: FALL_SPEED,
                         ease: 'None',
                         repeat: 0,
                         onComplete: function () {
@@ -589,7 +598,7 @@ function makeOrbsFall() {
 function replenishField() {
     var replenished = 0;
     var restart = false;
-    for (var j = 0; j < fieldSize; j++) {
+    for (var j = 0; j < FIELD_SIZE; j++) {
         var emptySpots = holesInCol(j);
         if (emptySpots > 0) {
             if (!fastFall && emptySpots > 1) {
@@ -597,8 +606,8 @@ function replenishField() {
                 restart = true;
             }
             for (i = 0; i < emptySpots; i++) {
-                var randomColor = Phaser.Math.Between(0, orbColors - 1);
-                var orb = orbGroup.scene.add.image(orbSize * j + orbSize / 2, -(orbSize * (emptySpots - 1 - i) + orbSize / 2), 'orbs', randomColor.toString()).setOrigin(0.5, 0.5).setInteractive();
+                var randomColor = Phaser.Math.Between(0, ORB_COLORS - 1);
+                var orb = orbGroup.scene.add.image(ORB_SIZE * j + ORB_SIZE / 2, -(ORB_SIZE * (emptySpots - 1 - i) + ORB_SIZE / 2), 'orbs', randomColor.toString()).setOrigin(0.5, 0.5).setInteractive();
                 gameArray[i][j] = {
                     orbColor: randomColor,
                     orbSprite: orb
@@ -609,9 +618,9 @@ function replenishField() {
                 // replenish field tween
                 tweens.add({
                     targets: gameArray[i][j].orbSprite,
-                    y: orbSize * i + orbSize / 2,
+                    y: ORB_SIZE * i + ORB_SIZE / 2,
                     ease: 'None',
-                    duration: fallSpeed,
+                    duration: FALL_SPEED,
                     repeat: 0,
                     onComplete: function () {
                         replenished--;
@@ -637,7 +646,7 @@ function replenishField() {
 
 function holesBelow(row, col) {
     var result = 0;
-    for (var i = row + 1; i < fieldSize; i++) {
+    for (var i = row + 1; i < FIELD_SIZE; i++) {
         if (gameArray[i][col] == null) {
             result++;
         }
@@ -647,7 +656,7 @@ function holesBelow(row, col) {
 
 function holesInCol(col) {
     var result = 0;
-    for (var i = 0; i < fieldSize; i++) {
+    for (var i = 0; i < FIELD_SIZE; i++) {
         if (gameArray[i][col] == null) {
             result++;
         }
